@@ -17,8 +17,7 @@ print(extractor.codonFrequency)
 
 # read the cas9 coding domain (DNA-form)
 with open("data/cas9_coding_domain_T_reesei.txt", mode = "r") as f:
-    raw_in = f.readlines()
-DNAseq = raw_in[1].strip()
+    DNAseq = f.readlines()[1].strip()
 
 # transform into AA sequence
 AAseq = cas.translateDNA(DNAseq)

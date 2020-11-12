@@ -12,7 +12,7 @@ import numpy as np
 from random import shuffle
 from itertools import product
 import re
-import random
+
 ###############################################################################
 # convenience functions
 ###############################################################################
