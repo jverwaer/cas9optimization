@@ -85,16 +85,19 @@ optimized_vs_target_pairsFreq = abs(cas.CodonPairFrequency(optimizer.codonPairFr
 optimized_str = "".join(optimized.get_codonList())
 print(optimized_str)
 
-# PRINT the rults
+# PRINT the results
 print("SUMMARY RESULTS")
 print("Distance between absolute codon pair frequencies observed", 
-      "in 'cas9_coding_domain_T_reesei' and frequencies ")
+      "in 'cas9_coding_domain_T_reesei' and frequencies =", orig_vs_target_pairsFreq)
 
 
 
-# ALTERNATIVE APPROACH: optimize codon frequencies (AS OPPOSED TO THE CODON
-# PAIR FREQUENCIES) such that the frequencies math those observed in th
-# higly expressed coding domains
+# =============================================================================
+# # ALTERNATIVE APPROACH: optimize codon frequencies (AS OPPOSED TO THE CODON
+# # PAIR FREQUENCIES) such that the frequencies math those observed in the
+# # higly expressed coding domains
+# =============================================================================
+
 # optimizer.optimizeCodingDomainUnivariate()
 # optimized_UNIVAR = optimizer.get_codingDomain()
 
@@ -111,37 +114,42 @@ print("Distance between absolute codon pair frequencies observed",
 # optimized_UNIVAR2 = optimizer2.get_codingDomain()
 # optimized_UNIVAR.hammingDistance(optimized_UNIVAR2)
 
+
 ###############################################################################
 # STEP 3: do some post-processing
 ###############################################################################
 
 # replace low-frequency codons
-with open("optimized_sequence_for_poae.txt" , mode = 'r') as f:
+# -----------------------------------------------------------------------------
+with open("results/optimized_sequence_for_poae.txt" , mode = 'r') as f:
     dnaSeq = f.read().strip()
-cd = CodingDomain(dnaSeq)
-replacements = cd.get_codonFrequency().lowFrequentCodonsAndReplacements(0.1, normalized = True)
-cd.replaceCodons(replacements)
+cd = cas.CodingDomain(dnaSeq)   # read optimized sequence from text file
+print(cd.as_DNAstring())
 
+# decide which codons are too low in frequency and find replacement
+replacements = cd.get_codonFrequency().lowFrequentCodonsAndReplacements(0.1, normalized = True)
+# do the replacement
+cd.replaceCodons(replacements)  
 
 # replace unwanted sequencies (typically restriction sites)
-extractor = CodonFrequencyExtractor('highly_expressed_cds.txt')
+# -----------------------------------------------------------------------------
+extractor = cas.CodonFrequencyExtractor('data/highly_expressed_cds.txt')
    
 # transform into AA sequence
-AAseq = translateDNA(dnaSeq)
-optimizer = CodonOptimizer(AAseq, extractor.codonFrequency ,extractor.codonPairFrequency)
+AAseq = cas.translateDNA(dnaSeq)
+optimizer = cas.CodonOptimizer(AAseq, extractor.codonFrequency ,extractor.codonPairFrequency)
 optimizer.aaSequence.set_codingDomain(cd)
 
-orig_vs_target_aaFreq = abs(CodonFrequency(optimizer.codonFrequency_target) - cd.get_codonFrequency())
-orig_vs_target_pairsFreq = abs(CodonPairFrequency(optimizer.codonPairFrequency_target) - cd.get_codonPairFrequency())
 
+# list strings that cannot be present
 restriction_sites = ["GGTACC", "TTCGAA", "TTAATTAA", "CACGTG", "AGATCT", "ACTAGT", "CTCGAG", "GTCGAC", "AAGCTT", "GAGCTC", "GGATCC"]
 
+# let the optimizer find optimal replacements
 optimizer.replaceUnwantedSubstrings(restriction_sites)
 cd.get_codonFrequency()
+# FINALLY: look at the result
+optimizer.get_codingDomain().as_DNAstring()
 
-orig_vs_target_aaFreq = abs(CodonFrequency(optimizer.codonFrequency_target) - cd.get_codonFrequency())
-orig_vs_target_pairsFreq = abs(CodonPairFrequency(optimizer.codonPairFrequency_target) - cd.get_codonPairFrequency())
 
-translateDNA(cd.as_DNAstring()) == translateDNA(dnaSeq)
     
     
