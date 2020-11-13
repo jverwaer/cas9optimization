@@ -2,25 +2,25 @@
 
 `cas9optimization` is Python package (single module, pure Python) that can be used perform codon optimization. The coding domain of a protein is optimized such that the frequency distribution of the codon pairs matches that of the distribution that is observed in highly expressed coding domains of the target organism.
 
-Even though the package is generic, it was designed to codon-optimize the CAS9 coding domain for the paper [1]
+Even though the package is generic, it was designed to codon-optimize the DNA sequence of the CAS9-gene (with a SV40 localization singal) for the paper [1]
 
 ### Methodological aspects
 
-The methodology is mainly borrowed from [2], where the coding domain of a protein is host-optimized by: 
+The methodology is mainly borrowed from [2], where the DNA sequence of a protein is host-optimized by: 
 
 1. **estimating** a set of **statistics** on the preferred **codon usage** of the host organism based on highly expressed protein-coding domains
-2. **optimize** the **coding domain** of a target protein such that the codon statistics match those estimated above.
+2. **optimize** the **DNA sequence** of a target protein such that the codon statistics match those estimated above.
 3. we added post **post-processing** functions (not described in [2]),  to avoid restriction sites and replace codons with a very low frequency
 
 The implementation allows to use two sets of statistics: (a) the (traditional) observed codon frequency distribution; and (b) the observed codon-pair frequency distribution, where a codon-pair consists of two consecutive codons.
 
-The main component of this package is an optimized *Simulated Annealing* (SA) algorithm that optimizes the coding domain (whereas [2] uses a genetic algorithm). Quite some work was invested in reducing the runtime of the algorithm by applying some computational tricks that allow to recompute the similarity between the host's codon-pair frequency distribution and that of the target protein after making a small change to the coding domain of the target protein. As a result the runtime is about 5 sec for a target protein such as CAS9. Note that his algorithm remains heuristic (and stochastic) and does not guarantee globally optimal solutions. 
+The main component of this package is an optimized *Simulated Annealing* (SA) algorithm that optimizes the DNA sequence (whereas [2] uses a genetic algorithm). Quite some work was invested in reducing the runtime of the algorithm by applying some computational tricks that allow to efficiently recompute the similarity between the host's codon-pair frequency distribution and that of the target protein after making a small change to the DNA sequence of the target protein. As a result the runtime is about 5 sec for a target protein such as CAS9. Note that his algorithm remains heuristic (and stochastic) and does not guarantee globally optimal solutions. It does, however, guarantee that locally optimal solutions are found, i.e, for any computed solution by the algorithm, a single swap of a codon will never improve performance.
 
 ### Examples
 
 An extensive example can be found in `cas9_optimization_main.py` . Below, you can find the key-steps.
 
-As a **first step**, a file containing the several highly expressed coding domains, one coding domain (DNA) string per line. In the `./data` folder, the file `highly_expressed_cds.txt` contains a set of highly expressed coding domains for *Fusarium poae*.  Lines starting with \# are ignored. These files are loaded and processed by a `CodonFrequencyExtractor`.
+As a **first step**, a file containing the several highly expressed coding domains, one coding domain (DNA-sequence) string per line. In the `./data` folder, the file `highly_expressed_cds.txt` contains a set of highly expressed coding domains for *Fusarium poae*.  Lines starting with \# are ignored. These files are loaded and processed by a `CodonFrequencyExtractor`.
 
  ```python
 import cas9_optimization as cas
@@ -62,7 +62,7 @@ As a **third step**, an `CodonOptimizer` object is created and applied.
 optimizer = cas.CodonOptimizer(AAseq, extractor.codonFrequency,
                                    extractor.codonPairFrequency)
 # perform codon optimization where the frequency distribution of codon pairs
-# is choosen to match the frequencey observed in the highly expressed domains
+# is choosen to match the frequency observed in the highly expressed domains
 message = optimizer.optimizeCodingDomainBivariate(algorithm="SA")
 
 # extract codon-optimzed DNA string
@@ -79,4 +79,4 @@ If you use this code, please cite ... *(to be added)*
 
 [1] ... *(ours, to be added)*
 
-[2]
+[2] Chung, B. K., & Lee, D. Y. (2012). Computational codon optimization of synthetic gene for protein expression. BMC systems biology, 6, 134. https://doi.org/10.1186/1752-0509-6-134
