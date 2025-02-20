@@ -87,8 +87,10 @@ print(optimized_str)
 
 # PRINT the results
 print("SUMMARY RESULTS")
-print("Distance between absolute codon pair frequencies observed", 
+print("Distance between absolute codon pair frequencies observed - before optimizing -", 
       "in 'cas9_coding_domain_T_reesei' and frequencies =", orig_vs_target_pairsFreq)
+print("Distance between absolute codon pair frequencies observed - after optimizing -", 
+      "in 'cas9_coding_domain_T_reesei' and frequencies =", optimized_vs_target_pairsFreq)
 
 
 
